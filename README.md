@@ -5,6 +5,8 @@
 # Installation
 ```bash
 git clone https://github.com/Murtaza-Udaipurwala/easy-theme.nvim
+cd easy-theme.nvim/
+pip install -r requirements.txt
 ```
 
 
