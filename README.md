@@ -1,0 +1,29 @@
+# Easy Theme
+> Generate neovim theme(in lua) from yaml file.
+
+
+# Installation
+```bash
+git clone https://github.com/Murtaza-Udaipurwala/easy-theme.nvim
+```
+
+
+## Usage
+- A sample template.yml is included in the repository
+- The `information` and `palette` section in yml file is compylsory
+- The highlight group properties in yml file must be in the order "foreground_color background_color style". Any property can be skipped using '-'
+- Styles:
+    1. i: italic
+    2. b: bold
+    3. u: underline
+    4. r: reverse
+- Eg:
+```yml
+  Normal: "fg bg"
+  Comment: "green - i"
+```
+- [Example yml file](https://raw.githubusercontent.com/ChristianChiarulli/nvcode-color-schemes.vim/master/onedark.yml)
+- To generate a colorscheme from the yaml file run:
+```bash
+python easy-theme.py -g <your_yaml_file>.yml
+```
