@@ -1,11 +1,14 @@
+#!/usr/bin/env python3
 import yaml
 import os
 import argparse
+import sys
 
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-g', '--generate', type=str, help="Takes yaml file as an input and generates a neovim colorscheme in lua", nargs="+")
+    parser.add_argument('filename', type=argparse.FileType('r'),
+                        help='pass a filename')
     args = parser.parse_args()
     return args
 
@@ -15,8 +18,9 @@ def write(fname, content):
         fhand.write(content)
 
 
-def colors(name):
-    code = f"lua require('{name}')"
+def colors(name, author):
+    code = f'" Author: {author}\nlua require("{name}")'
+
     with open(os.path.join(os.path.join(name, 'colors', f'{name}.vim')), 'w') as fhand:
         fhand.write(code)
 
@@ -76,7 +80,7 @@ return M'''
     write('util.lua', code)
 
 
-def init(name, author, background, keys):
+def init(name, background, keys):
     requirements = ""
     for key in keys:
         requirements += f'local {key} = require("{name}.{key}")\n'
@@ -157,39 +161,47 @@ def gen_skeleton(syntax, name, colorscheme_name):
 
 if __name__ == "__main__":
     args = parse_arguments()
+    with args.filename as fhand:
+        if fhand.name.endswith('.yml') or fhand.name.endswith('.yaml'):
+            obj = yaml.safe_load(fhand)
+        else:
+            print("File must have an extension .yml or .yaml")
+            sys.exit()
 
-    if args.generate:
-        filename = args.generate[0]
-        with open(filename, 'r') as stream:
-            obj = yaml.safe_load(stream)
+    keys = [key for key in obj]
+    if 'palette' not in keys:
+        print("palette section not found in yaml file")
+        sys.exit()
+    elif 'information' not in keys:
+        print("information section not found in yaml file")
+        sys.exit()
 
-        styles = {
-            'i': 'italic',
-            'b': 'bold',
-            'u': 'underline',
-            'r': 'reverse'
-        }
-        colorscheme = obj['information']['name']
-        author = obj['information']['author']
-        background = obj['information']['background']
-        base_path = os.path.join(colorscheme, 'lua', colorscheme)
+    styles = {
+        'i': 'italic',
+        'b': 'bold',
+        'u': 'underline',
+        'r': 'reverse'
+    }
+    colorscheme = obj['information']['name']
+    author = obj['information']['author']
+    background = obj['information']['background']
+    base_path = os.path.join(colorscheme, 'lua', colorscheme)
 
-        try:
-            os.makedirs(base_path)
-            path = os.path.join(colorscheme, "colors")
-            os.makedirs(path)
-        except:
-            pass
+    try:
+        os.makedirs(base_path)
+        path = os.path.join(colorscheme, "colors")
+        os.makedirs(path)
+    except:
+        pass
 
-        keys = [key for key in obj]
-        keys.remove('palette')
-        keys.remove('information')
+    keys.remove('palette')
+    keys.remove('information')
 
-        gen_palette(obj['palette'])
-        init(colorscheme, author, background, keys)
-        util()
-        colors(colorscheme)
-        config(colorscheme)
+    gen_palette(obj['palette'])
+    init(colorscheme, background, keys)
+    util()
+    colors(colorscheme, author)
+    config(colorscheme)
 
-        for key in keys:
-            gen_skeleton(obj[key], key, colorscheme)
+    for key in keys:
+        gen_skeleton(obj[key], key, colorscheme)

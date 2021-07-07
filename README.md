@@ -15,10 +15,10 @@ pip install -r requirements.txt
 - The `information` and `palette` section in yml file is compylsory
 - The highlight group properties in yml file must be in the order "foreground_color background_color style". Any property can be skipped using '-'
 - Styles:
-    1. i: italic
-    2. b: bold
-    3. u: underline
-    4. r: reverse
+    * i: italic
+    * b: bold
+    * u: underline
+    * r: reverse
 - Eg:
 ```yml
   Normal: "fg bg"
@@ -27,5 +27,5 @@ pip install -r requirements.txt
 - [Example yml file](https://raw.githubusercontent.com/ChristianChiarulli/nvcode-color-schemes.vim/master/onedark.yml)
 - To generate a colorscheme from the yaml file run:
 ```bash
-python easy-theme.py -g <your_yaml_file>.yml
+python easy-theme.py <your_yaml_file>.yml
 ```
