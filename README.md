@@ -12,7 +12,7 @@ pip install -r requirements.txt
 
 ## Usage
 - A sample template.yml is included in the repository
-- The `information` and `palette` section in yml file is compylsory
+- The `information` and `palette` keys in yml file are compulsory
 - The highlight group properties in yml file must be in the order "foreground_color background_color style". Any property can be skipped using '-'
 - Styles:
     * i: italic

@@ -170,10 +170,10 @@ if __name__ == "__main__":
 
     keys = [key for key in obj]
     if 'palette' not in keys:
-        print("palette section not found in yaml file")
+        print("palette key not found in yaml file")
         sys.exit()
     elif 'information' not in keys:
-        print("information section not found in yaml file")
+        print("information key not found in yaml file")
         sys.exit()
 
     styles = {
