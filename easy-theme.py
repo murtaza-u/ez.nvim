@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+
+# Author: Murtaza Udaipurwala <https://github.com/Murtaza-Udaipurwala>
+
 import yaml
 import os
 import argparse
