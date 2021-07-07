@@ -38,6 +38,10 @@ end
 
 config = {
     transparent_background = opt("transparent_background", false),
+    italic_comments = opt("italic_keywords", true) and "italic" or "NONE",
+    italic_keywords = opt("italic_keywords", true) and "italic" or "NONE",
+    italic_functions = opt("italic_function", false) and "italic" or "NONE",
+    italic_variables = opt("italic_variables", true) and "italic" or "NONE",
 }
 
 return config'''
@@ -125,14 +129,27 @@ def gen_skeleton(syntax, name, colorscheme_name):
                     if i == 2:
                         style = ','.join([styles[char] for char in props[i]])
                         skeleton += f'{prop_keys[i]} = "{style}", '
-                    else:
-                        if group == "Normal" and i == 1:
+                    elif i == 1:
+                        if group == "Normal":
                             skeleton += f'{prop_keys[i]} = Config.transparent_background and "NONE" or C.{props[i]}, '
+                        elif group == "Keyword":
+                            skeleton += f'{prop_keys[i]} = Config.italic_keywords, '
+                        elif group == "Comment":
+                            skeleton += f'{prop_keys[i]} = Config.italic_comments, '
+                        elif group == "Identifier":
+                            skeleton += f'{prop_keys[i]} = Config.italic_variables, '
+                        elif group == "Function":
+                            skeleton += f'{prop_keys[i]} = Config.italic_functions, '
                         elif props[i][0] == '#':
                             skeleton += f'{prop_keys[i]} = "{props[i]}", '
                         else:
                             skeleton += f"{prop_keys[i]} = C.{props[i]}, "
-        code += '\t' + skeleton + '},\n'
+                    else:
+                        if props[i][0] == '#':
+                            skeleton += f'{prop_keys[i]} = "{props[i]}", '
+                        else:
+                            skeleton += f"{prop_keys[i]} = C.{props[i]}, "
+            code += '\t' + skeleton + '},\n'
 
     code += "}\n\nreturn " + name
     write(f'{name}.lua', code)
