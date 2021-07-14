@@ -21,8 +21,17 @@ def write(fname, content):
         fhand.write(content)
 
 
-def colors(name, author):
-    code = f'" Author: {author}\nlua require("{name}")'
+def colors(name, author, keys):
+    loaded = f"package.loaded['{name}'] = nil\n"
+    for key in keys:
+        loaded += f"package.loaded['{name}.{key}'] = nil\n"
+
+    code = f'''" Author: {author}\n
+lua << EOF
+{loaded}
+require("{name}")
+EOF
+'''
 
     with open(os.path.join(os.path.join(name, 'colors', f'{name}.vim')), 'w') as fhand:
         fhand.write(code)
@@ -202,9 +211,6 @@ if __name__ == "__main__":
         print("information key not found in yaml file")
         sys.exit()
 
-    keys.remove('palette')
-    keys.remove('information')
-
     styles = {
         'i': 'italic',
         'b': 'bold',
@@ -229,20 +235,26 @@ if __name__ == "__main__":
         pass
 
     asynchronous = obj['async'] if 'async' in keys else None
+    all_keys = []
 
     if asynchronous is None:
         asynchronous = []
     else:
         for key in asynchronous:
+            all_keys.append(key)
             gen_skeleton(asynchronous[key], key, colorscheme)
         keys.remove('async')
 
     gen_palette(obj['palette'])
     util()
-    colors(colorscheme, author)
     config(colorscheme)
+
+    keys.remove('information')
+    all_keys.extend(keys)
+    keys.remove('palette')
 
     for key in keys:
         gen_skeleton(obj[key], key, colorscheme)
 
     init(colorscheme, background, keys, asynchronous)
+    colors(colorscheme, author, all_keys)
