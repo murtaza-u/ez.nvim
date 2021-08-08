@@ -92,15 +92,10 @@ return M'''
     write('util.lua', code)
 
 
-def init(name, background, synchronous, asynchronous):
-    synchronous_requirements = ""
-    asynchronous_requirements = ""
-
-    for key in synchronous:
-        synchronous_requirements += f'local {key} = require("{name}.{key}")\n'
-
-    for key in asynchronous:
-        asynchronous_requirements += f'local {key} = require("{name}.{key}")\n\t'
+def init(name, background, keys):
+    requirements = ""
+    for key in keys:
+        requirements += f'local {key} = require("{name}.{key}")\n'
 
     code = f'''vim.api.nvim_command("hi clear")
 if vim.fn.exists("syntax_on") then
@@ -113,33 +108,15 @@ vim.g.colors_name = "{name}"
 local util = require("{name}.util")
 Config = require("{name}.config")
 C = require("{name}.palette")
-
-local async
-async = vim.loop.new_async(vim.schedule_wrap(function ()
-    {asynchronous_requirements}
-
-    local skeletons = {{
-        {", ".join(asynchronous)}
-    }}
-
-    for _, skeleton in ipairs(skeletons) do
-        util.initialise(skeleton)
-    end
-
-    async:close()
-end))
-
-{synchronous_requirements}
+{requirements}
 
 local skeletons = {{
-    {", ".join(synchronous)}
+    {", ".join(keys)}
 }}
 
 for _, skeleton in ipairs(skeletons) do
     util.initialise(skeleton)
-end
-
-async:send()'''
+end'''
 
     write('init.lua', code)
 
@@ -217,15 +194,10 @@ if __name__ == "__main__":
         'u': 'underline',
         'r': 'reverse'
     }
-
-    try:
-        colorscheme = obj['information']['name']
-        author = obj['information']['author']
-        background = obj['information']['background']
-        base_path = os.path.join(colorscheme, 'lua', colorscheme)
-    except:
-        print("One of the following keys missing in information: ['name', 'author', 'background']")
-        sys.exit()
+    colorscheme = obj['information']['name']
+    author = obj['information']['author']
+    background = obj['information']['background']
+    base_path = os.path.join(colorscheme, 'lua', colorscheme)
 
     try:
         os.makedirs(base_path)
@@ -234,27 +206,14 @@ if __name__ == "__main__":
     except:
         pass
 
-    asynchronous = obj['async'] if 'async' in keys else None
-    all_keys = []
-
-    if asynchronous is None:
-        asynchronous = []
-    else:
-        for key in asynchronous:
-            all_keys.append(key)
-            gen_skeleton(asynchronous[key], key, colorscheme)
-        keys.remove('async')
+    keys.remove('palette')
+    keys.remove('information')
 
     gen_palette(obj['palette'])
+    init(colorscheme, background, keys)
     util()
+    colors(colorscheme, author, keys)
     config(colorscheme)
-
-    keys.remove('information')
-    all_keys.extend(keys)
-    keys.remove('palette')
 
     for key in keys:
         gen_skeleton(obj[key], key, colorscheme)
-
-    init(colorscheme, background, keys, asynchronous)
-    colors(colorscheme, author, all_keys)

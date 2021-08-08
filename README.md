@@ -12,14 +12,8 @@ pip install -r requirements.txt
 
 # Features
 - Easily generate a modularized colorscheme in lua from a yaml file
-- Supports asynchronous loading
 - The generated colorscheme is well written lua code providing a solid base for further extending the colorscheme
 - All the highlighting can be modularized into different, more managable files
-
-
-# What do I mean by async loading
-- Everything you wrap around `async:` key in yaml file will be loaded asynchronously by neovim and will not block the loading of other plugins.
-- In short, it will make neovim load a little bit faster.
 
 
 ## Usage
@@ -36,7 +30,6 @@ pip install -r requirements.txt
   Normal: "fg bg"
   Comment: "green - i"
 ```
-- Everything except basic highlights and treesitter highlights can be wrapped inside `async:` key. Refer [template.yml](https://github.com/Murtaza-Udaipurwala/ez.nvim/blob/master/template.yml)
 - [Example yml file](https://raw.githubusercontent.com/ChristianChiarulli/nvcode-color-schemes.vim/master/onedark.yml)
 - To generate a colorscheme from the yaml file run:
 ```bash
